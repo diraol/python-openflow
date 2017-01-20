@@ -1023,6 +1023,11 @@ class GenericStruct(object, metaclass=MetaStruct):
         # pylint: disable=unreachable
         return self._validate_attributes_type()
 
+    @staticmethod
+    def is_message():
+        """Return False to indicate that this is not an OF Message."""
+        return False
+
 
 class GenericMessage(GenericStruct):
     """Base class that is the foundation for all OpenFlow messages.
@@ -1040,12 +1045,18 @@ class GenericMessage(GenericStruct):
         super().__init__()
         self.header.xid = randint(0, MAXID) if xid is None else xid
 
-    def __init_subclass__(cls, **kwargs):
-        if cls.header is None or cls.header.__class__.__name__ != 'Header':
-            msg = "The header attribute must be implemented on the class "
-            msg += cls.__name__ + "."
-            raise NotImplementedError(msg)
+    @classmethod
+    def __init_subclass__(cls, message_type, **kwargs):
         super().__init_subclass__(**kwargs)
+        if message_type is not None:
+            version = MetaStruct._get_module_version(cls.__module__)
+            cls.header = MetaStruct._get_new_header(version, message_type)
+
+            def is_message():
+                """Replace the staticmethod 'is_message' from GenericStruct."""
+                return True
+
+            cls.is_message = staticmethod(is_message)
 
     def _validate_message_length(self):
         return self.header.length == self.get_size()

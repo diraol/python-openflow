@@ -1038,6 +1038,7 @@ class GenericMessage(GenericStruct):
               also a :attr:`header` attribute.
     """
 
+    _messages = {}
     header = None
 
     def __init__(self, xid=None):
@@ -1048,9 +1049,26 @@ class GenericMessage(GenericStruct):
     @classmethod
     def __init_subclass__(cls, message_type, **kwargs):
         super().__init_subclass__(**kwargs)
+
+        def raise_protected(self):
+            """Protect access to GenericMessage._messages.
+
+            This method will work as a property on all messages just to avoid
+            direct access to the _messages attribute from GenericMessage class.
+            """
+            msg = '_messages attribute can only be accessed through the '
+            msg += 'GenericMessage class'
+            raise Exception(msg)
+
+        #: override the _messages attribute with the defined property.
+        cls._messages = property(raise_protected)
+
         if message_type is not None:
             version = MetaStruct._get_module_version(cls.__module__)
             cls.header = MetaStruct._get_new_header(version, message_type)
+            if version not in GenericMessage._messages:
+                GenericMessage._messages[version] = {}
+            GenericMessage._messages[version][message_type] = cls
 
             def is_message():
                 """Replace the staticmethod 'is_message' from GenericStruct."""

@@ -419,7 +419,7 @@ class MetaStruct(type):
         return (attr[0], new_header)
 
     @staticmethod
-    def get_pyof_version(module_fullname):
+    def get_pyof_mod_version(module_fullname):
         """Get the module pyof version based on the module fullname.
 
         Args:

@@ -17,15 +17,18 @@ These classes are used in all parts of this library.
 
 # System imports
 import importlib
+import inspect
 import re
 import struct
 from collections import OrderedDict
 from copy import deepcopy
 from enum import Enum, IntEnum
+from random import randint
 
 # Local source tree imports
-from pyof.foundation.exceptions import (
-    BadValueException, PackException, UnpackException, ValidationError)
+from pyof.foundation.constants import UBINT32_MAX_VALUE as MAXID
+from pyof.foundation.exceptions import (BadValueException, PackException,
+                                        UnpackException, ValidationError)
 
 # Third-party imports
 

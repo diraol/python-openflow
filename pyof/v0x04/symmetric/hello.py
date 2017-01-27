@@ -7,6 +7,8 @@ from enum import IntEnum
 from pyof.foundation.base import GenericMessage, GenericStruct
 from pyof.foundation.basic_types import BinaryData, FixedTypeList, UBInt16
 from pyof.v0x04.common.header import Header, Type
+=======
+from pyof.v0x01.symmetric.hello import Hello as _Hello
 
 # Third-party imports
 
@@ -45,45 +47,6 @@ class HelloElemHeader(GenericStruct):
         self.length = length
 
 
-class ListOfHelloElements(FixedTypeList):
-    """List of Hello elements.
-
-    Represented by instances of HelloElemHeader and used on Hello
-    objects.
-    """
-
-    def __init__(self, items=None):
-        """The constructor just assigns parameters to object attributes.
-
-        Args:
-            items (HelloElemHeader): Instance or a list of instances.
-        """
-        super().__init__(pyof_class=HelloElemHeader, items=items)
-
-
-class Hello(GenericMessage):
-    """OpenFlow Hello Message OFPT_HELLO.
-
-    This message includes zero or more hello elements having variable size.
-    Unknown element types must be ignored/skipped, to allow for future
-    extensions.
-    """
-
-    header = Header(message_type=Type.OFPT_HELLO)
-    #: Hello element list
-    elements = ListOfHelloElements()
-
-    def __init__(self, xid=None, elements=None):
-        """The constructor takes the parameters below.
-
-        Args:
-            xid (int): xid to be used on the message header.
-            elements: List of elements - 0 or more
-        """
-        super().__init__(xid)
-        self.elements = elements
-
-
 class HelloElemVersionbitmap(HelloElemHeader):
     """Version bitmap Hello Element."""
 
@@ -102,3 +65,40 @@ class HelloElemVersionbitmap(HelloElemHeader):
         super().__init__(element_type=HelloElemType.OFPHET_VERSIONBITMAP,
                          length=None)
         self.bitmaps = bitmaps
+
+
+class ListOfHelloElements(FixedTypeList):
+    """List of Hello elements.
+
+    Represented by instances of HelloElemHeader and used on Hello
+    objects.
+    """
+
+    def __init__(self, items=None):
+        """The constructor just assigns parameters to object attributes.
+
+        Args:
+            items (HelloElemHeader): Instance or a list of instances.
+        """
+        super().__init__(pyof_class=HelloElemHeader, items=items)
+
+
+class Hello(_Hello, message_type='OFPT_HELLO'):
+    """OpenFlow Hello Message OFPT_HELLO.
+
+    This message includes zero or more hello elements having variable size.
+    Unknown element types must be ignored/skipped, to allow for future
+    extensions.
+    """
+
+    elements = ListOfHelloElements()
+
+    def __init__(self, xid=None, elements=None):
+        """The constructor takes the parameters below.
+
+        Args:
+            xid (int): xid to be used on the message header.
+            elements: List of elements - 0 or more
+        """
+        super().__init__(xid)
+        self.elements = elements

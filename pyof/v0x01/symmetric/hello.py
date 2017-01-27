@@ -12,10 +12,10 @@ __all__ = ('Hello',)
 # Classes
 
 
-class Hello(GenericMessage):
+class Hello(GenericMessage, message_type='OFPT_HELLO'):
     """OpenFlow Hello Message.
 
     This message does not contain a body beyond the OpenFlow Header.
     """
 
-    header = Header(message_type=Type.OFPT_HELLO, length=8)
+    header = Header()

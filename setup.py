@@ -118,6 +118,7 @@ setup(name='python-openflow',
       license='MIT',
       test_suite='tests',
       include_package_data=True,
+      install_requires=['jsonpickle']
       extras_require={
           'dev': [
               'coverage',

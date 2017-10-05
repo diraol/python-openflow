@@ -28,6 +28,7 @@ from pyof.foundation.exceptions import (
     BadValueException, PackException, UnpackException, ValidationError)
 
 # Third-party imports
+import jsonpickle
 
 
 # This will determine the order on sphinx documentation.
@@ -37,7 +38,20 @@ __all__ = ('GenericStruct', 'GenericMessage', 'GenericType', 'GenericBitMask',
 # Classes
 
 
-class GenericType:
+class Serializeable:
+    """Implements to_json and from_json methods to (de)serialize the obj."""
+
+    def to_json(self):
+        """Convert the object to a json using jsonpickle."""
+        return jsonpickle.encode(self)
+
+    @staticmethod
+    def from_json(json):
+        """Return an object by decoding the json using jsonpickle."""
+        return jsonpickle.decode(json)
+
+
+class GenericType(Serializeable):
     """Foundation class for all custom attributes.
 
     Base class for :class:`~.UBInt8`, :class:`~.Char`
@@ -476,7 +490,7 @@ class MetaStruct(type):
         return (name, obj)
 
 
-class GenericStruct(object, metaclass=MetaStruct):
+class GenericStruct(Serializeable, object, metaclass=MetaStruct):
     """Class inherited by all OpenFlow structs.
 
     If you need to insert a method that will be used by all structs, this is
@@ -845,7 +859,7 @@ class MetaBitMask(type):
         return res
 
 
-class GenericBitMask(object, metaclass=MetaBitMask):
+class GenericBitMask(Serializeable, object, metaclass=MetaBitMask):
     """Base class for enums that use bitmask values."""
 
     def __init__(self, bitmask=None):
